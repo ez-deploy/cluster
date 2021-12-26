@@ -3,7 +3,7 @@ module github.com/ez-deploy/cluster
 go 1.17
 
 require (
-	github.com/ez-deploy/protobuf v0.0.0-20211223092003-be86a1b2e676
+	github.com/ez-deploy/protobuf v0.0.0-20211225092149-7b9c7bfba13c
 	google.golang.org/grpc v1.43.0
 	k8s.io/api v0.23.1
 	k8s.io/apimachinery v0.23.1

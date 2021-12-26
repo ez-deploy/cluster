@@ -10,7 +10,7 @@ import (
 type Service struct {
 	k8sClientset *kubernetes.Clientset
 
-	pb.UnimplementedOpsServer
+	pb.UnimplementedProjectOpsServer
 }
 
 // New in-cluster service.
