@@ -5,22 +5,36 @@ import (
 
 	"github.com/ez-deploy/protobuf/model"
 	pb "github.com/ez-deploy/protobuf/project"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	corev1 "k8s.io/client-go/applyconfigurations/core/v1"
 )
 
 const tryExistLimit = 3
 
 // CreateProject via k8s client-go (exactly, create a namespace).
 func (s *Service) CreateProject(ctx context.Context, req *pb.CreateProjectReq) (*model.CommonResp, error) {
-	namespace := corev1.Namespace(req.Project.Name)
-	options := metav1.ApplyOptions{}
+	namespace := &corev1.Namespace{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Namespace",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        req.Project.Name,
+			Annotations: map[string]string{},
+		},
+	}
 
-	if _, err := s.k8sClientset.CoreV1().Namespaces().Apply(ctx, namespace, options); err != nil {
+	if len(req.Project.Describe) != 0 {
+		namespace.ObjectMeta.Annotations["describe"] = req.Project.Describe
+	}
+
+	options := metav1.CreateOptions{}
+
+	if _, err := s.k8sClientset.CoreV1().Namespaces().Create(ctx, namespace, options); err != nil {
 		return model.NewCommonRespWithError(err), nil
 	}
 
-	return &model.CommonResp{}, nil
+	return &model.CommonResp{Error: nil}, nil
 }
 
 // DeleteProject via k8s client-go (exactly, delete a namespace).
